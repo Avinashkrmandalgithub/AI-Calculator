@@ -1,5 +1,5 @@
 export const generateAiResponse = async (question) => {
-  const res = await fetch("http://localhost:5000/api/gemini", {
+  const res = await fetch("https://ai-calculator-nczp.onrender.com/api/gemini", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
