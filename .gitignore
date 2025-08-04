@@ -1,0 +1,20 @@
+# Logs (frontend + backend)
+**/logs
+**/*.log
+
+# Node modules in any subdir
+**/node_modules/
+
+# Builds in subdirs (e.g., frontend 'dist', backend 'build')
+**/dist/
+**/build/
+
+# Environment files in subdirs
+**/.env
+**/.env.*.local
+
+# Optional: OS and IDE files
+*.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
