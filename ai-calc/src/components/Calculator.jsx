@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useHistory } from "../context/HistoryContext";
+import { Parser } from "expr-eval"; // ✅ Added parser
 
 const Calculator = () => {
   const [expression, setExpression] = useState("");
@@ -10,10 +11,8 @@ const Calculator = () => {
     if (value === "=") {
       if (!expression.trim()) return;
 
-      // Check for a valid expression: at least one operator and two numbers
-      const isValidExpression = /^-?\d+(\.\d+)?([+\-x/]-?\d+(\.\d+)?)+$/.test(
-        expression
-      );
+      // Check for a valid expression (at least one operator and two numbers)
+      const isValidExpression = /^-?\d+(\.\d+)?([+\-x/]-?\d+(\.\d+)?)+$/.test(expression);
       if (!isValidExpression) {
         setResult("Invalid expression");
         return;
@@ -21,7 +20,8 @@ const Calculator = () => {
 
       try {
         const sanitized = expression.replace(/x/g, "*");
-        const evalResult = eval(sanitized);
+        const parser = new Parser();
+        const evalResult = parser.evaluate(sanitized); // ✅ Replaced eval
         setResult(evalResult);
         addToHistory({
           type: "calc",
@@ -36,7 +36,6 @@ const Calculator = () => {
       setExpression("");
       setResult("");
     } else if (value === "+/-") {
-      // Flip the sign of the last number
       const tokens = expression.match(/([-+]?\d*\.?\d+|\D)/g) || [];
       for (let i = tokens.length - 1; i >= 0; i--) {
         if (!isNaN(tokens[i])) {
@@ -47,7 +46,6 @@ const Calculator = () => {
       }
       setExpression(tokens.join(""));
     } else {
-      // If result exists, and user clicks number or operator, start fresh
       if (result && !isOperator(value)) {
         setExpression(value);
       } else {
@@ -74,37 +72,21 @@ const Calculator = () => {
 
       <div className="grid grid-cols-4 gap-3">
         {[
-          "AC",
-          "+/-",
-          "%",
-          "/",
-          "7",
-          "8",
-          "9",
-          "x",
-          "4",
-          "5",
-          "6",
-          "-",
-          "1",
-          "2",
-          "3",
-          "+",
-          "0",
-          ".",
-          "=",
+          "AC", "+/-", "%", "/",
+          "7", "8", "9", "x",
+          "4", "5", "6", "-",
+          "1", "2", "3", "+",
+          "0", ".", "="
         ].map((label, index) => (
           <button
             key={index}
             onClick={() => handleClick(label)}
             className={`font-bold py-2 rounded transition-all duration-200
-              ${
-                isOperator(label)
-                  ? "bg-orange-500 hover:bg-orange-600 text-white"
-                  : isFunction(label)
-                  ? "bg-gray-400 hover:bg-gray-500 text-white"
-                  : "bg-gray-200 hover:bg-gray-300 text-black"
-              }
+              ${isOperator(label)
+                ? "bg-orange-500 hover:bg-orange-600 text-white"
+                : isFunction(label)
+                ? "bg-gray-400 hover:bg-gray-500 text-white"
+                : "bg-gray-200 hover:bg-gray-300 text-black"}
               ${isZero(label) ? "col-span-2" : ""}`}
           >
             {label}
